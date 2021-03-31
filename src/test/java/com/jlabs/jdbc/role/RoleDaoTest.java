@@ -8,6 +8,7 @@ import com.jlabs.jdbc.dao.tx.TransactionCallback;
 import com.jlabs.jdbc.dao.tx.SimpleTransactionTemplate;
 import com.jlabs.jdbc.model.Role;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,16 +36,24 @@ public class RoleDaoTest {
 
         Connection connection = ConnectionManager.getConnection();
 
-        Role adminRole = new SimpleTransactionTemplate(connection).execute(new TransactionCallback<Role>() {
+        final Role adminRole = new SimpleTransactionTemplate(connection).execute(new TransactionCallback<Role>() {
             @Override
             public Role runInTransaction(Connection connection) throws SQLException {
                 RoleDao roleDao = new RoleDaoJdbc(connection);
-                Role admin = roleDao.save(new Role("ADMIN"));
-                return admin;
+                return roleDao.save(new Role("ADMIN"));
+            }
+        });
+
+        Role adminRoleFromDb = new SimpleTransactionTemplate(connection).execute(new TransactionCallback<Role>() {
+            @Override
+            public Role runInTransaction(Connection connection) throws SQLException {
+                RoleDao roleDao = new RoleDaoJdbc(connection);
+                return roleDao.get( adminRole.getId() );
             }
         });
 
         ConnectionManager.close( connection );
 
+        Assert.assertNotNull( adminRoleFromDb );
     }
 }
