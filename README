@@ -1,0 +1,7 @@
+
+Entry-point:
+
+    JUnit test, run as maven test task.
+    mvn test
+
+    com.jlabs.jdbc.role.RoleDaoTest
